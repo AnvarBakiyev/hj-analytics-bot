@@ -57,6 +57,29 @@ def gql(tok, op, q, v=None):
         return d.get('data',{}), d.get('errors',[])
     except Exception as e: return {}, [{'message':str(e)}]
 
+
+def sms(p):
+    h = {'accept': '*/*', 'content-type': 'application/json', 'user-agent': UA}
+    q = 'mutation getVerificationCode($phoneNumber: String!) { getVerificationCode(phoneNumber: $phoneNumber) { status } }'
+    try:
+        r = requests.post(HJ, headers=h,
+            json={'operationName': 'getVerificationCode', 'variables': {'phoneNumber': p}, 'query': q}, timeout=15)
+        result = (r.json().get('data') or {}).get('getVerificationCode', {})
+        return result.get('status', '') == 'ok'
+    except:
+        return False
+
+
+def vcode(p, c):
+    h = {'accept': '*/*', 'content-type': 'application/json', 'user-agent': UA}
+    q = 'mutation verifyPhoneNumberWithCode($input: CodeInput!) { verifyPhoneNumberWithCode(input: $input) { status token } }'
+    try:
+        r = requests.post(HJ, headers=h,
+            json={'operationName': 'verifyPhoneNumberWithCode', 'variables': {'input': {'code': c, 'phoneNumber': p}}, 'query': q}, timeout=15)
+        res = (r.json().get('data') or {}).get('verifyPhoneNumberWithCode', {})
+        return res.get('token', '') if res.get('status') == '200' else None
+    except:
+        return None
 def collect_all_data(tok, uid):
     out = {}
 
