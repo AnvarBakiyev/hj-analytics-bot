@@ -761,5 +761,5 @@ while True:
                     try: handle(msg)
                     except Exception as e:
                         c = msg.get('chat',{}).get('id')
-                        if c: send(c,'⚠️ Ошибка. Напиши /start.')
+                        if c: send(c,'⚠️ Ошибка: <code>'+type(e).__name__+': '+str(e)[:200]+'</code>')
     except: time.sleep(3)
